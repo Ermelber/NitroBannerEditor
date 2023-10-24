@@ -77,30 +77,35 @@ function saveXml() {
 
 // Encode a string to Base64 UTF-16LE
 function encodeToBase64UTF16LE(inputString) {
-    // Convert the string to a Uint8Array with UTF-16LE encoding
-    const encoder = new TextEncoder('utf-16le');
+    // Manually encode the string to UTF-16LE
+    const encoder = new TextEncoder();
     const data = encoder.encode(inputString);
+    const utf16leArray = new Uint8Array(data.length * 2);
     
+    for (let i = 0; i < data.length; i++) {
+      utf16leArray[i * 2] = data[i] & 0xFF;
+      utf16leArray[i * 2 + 1] = data[i] >> 8;
+    }
+  
     // Convert the Uint8Array to a Base64-encoded string
-    const base64String = btoa(String.fromCharCode(...data));
+    const base64String = btoa(String.fromCharCode(...utf16leArray));
     
     return base64String;
   }
-  
-  // Decode a Base64 UTF-16LE string to a regular string
-  function decodeFromBase64UTF16LE(base64String) {
+
+// Decode a Base64 UTF-16LE string to a regular string
+function decodeFromBase64UTF16LE(base64String) {
     // Decode the Base64 string to a binary string
     const binaryString = atob(base64String);
-    
+
     // Convert the binary string to a Uint8Array
     const uint8Array = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
-      uint8Array[i] = binaryString.charCodeAt(i);
+        uint8Array[i] = binaryString.charCodeAt(i);
     }
-    
+
     // Decode the Uint8Array to a string with UTF-16LE encoding
     const decoder = new TextDecoder('utf-16le');
     const decodedString = decoder.decode(uint8Array);
-    
     return decodedString;
-  }
+}
